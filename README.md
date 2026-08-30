@@ -1,5 +1,7 @@
 # AI Vault
 
+[English](README.md) | [简体中文](README.zh-CN.md)
+
 > A local-first, human-readable personal knowledge vault where work stays
 > editable, evidence stays traceable, and an LLM helps compile—not silently
 > replace—durable knowledge.
