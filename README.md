@@ -7,9 +7,10 @@
 > replace—durable knowledge.
 
 **AI Vault** combines the action-oriented organisation of PARA with an
-agent-managed LLM Wiki. It is a public, reusable vault blueprint: the repository
-contains its structure, templates, operating rules, and agent skills, while
-personal notes and source material remain local by default.
+agent-managed LLM Wiki **and an AI management layer for PARA itself**. It is a
+public, reusable vault blueprint: the repository contains its structure,
+templates, operating rules, and agent skills, while personal notes and source
+material remain local by default.
 
 ## Why this exists
 
@@ -36,6 +37,29 @@ versioned with Git, and gives coding agents a precise operating contract.
 | Current work ≠ durable knowledge | Plans, TODOs, project status, and early thinking stay in source layers unless explicitly selected and confirmed. |
 | Provenance over text matching | Source hashes/revisions detect drift; changed sources trigger review instead of automatic semantic rewriting. |
 | Rebuildable machinery | Manifests, indexes, and derived navigation are machine-managed state—not a hidden second source of truth. |
+
+## More than an LLM Wiki: AI-managed PARA work
+
+AI Vault does not use PARA merely as a folder taxonomy. Its local skills make the
+human-readable, user-writable source layers (`01_inbox`–`04_Resource`) actively
+manageable by an AI collaborator. This complements the LLM Wiki skills that
+ingest, query, lint, dashboard, and synthesize confirmed knowledge.
+
+| Layer / workflow | AI management capability | PARA pain point it addresses | Derived or controlled output |
+| --- | --- | --- | --- |
+| `01_inbox` — `vault-governance`, `research-capture` | Routes new input by intent; preserves originals; separates source facts from an AI research synthesis. | An untriaged inbox becomes a black hole, while source files lose their context. | Routed note, immutable original/metadata, and a source-cited research report—never an automatic Wiki promotion. |
+| `02_Project` — `project-management` | Maintains atomic plans, decisions, activities, and local knowledge; derives the live overview from them. | Project truth gets buried in one giant note or scattered status updates. | `overview.md` with current health, focus, AP/issue counts, blockers, plan items, and links to current records. |
+| `02_Project` — weekly reporting | Reads all activities, the prior report, plans, relevant decisions, and the overview; reconciles them before reporting. | Manual weekly reports miss carried work, invent progress, or repeat stale status. | Evidence-backed `wk_reports/YYYY-Www.md`, followed by an overview update when current state changed. |
+| `03_Area` — `area-management` | Keeps long-lived notes understandable; tracks append/snapshot change modes and prepares affected-Wiki review proposals. | Evolving domain notes drift without becoming a forced Wiki mirror. | A durable source note plus a reviewable freshness proposal, not an autonomous semantic rewrite. |
+| `04_Resource` — `resource-management` | Creates curated resource cards with purpose, source, lifecycle, and related use. | A collection of links cannot explain why a source matters, whether it was reviewed, or where it is used. | Contextual resource card and, when relevant, a controlled handoff proposal to Wiki evidence. |
+| Cross-layer — `vault-governance` | Distinguishes current work, durable source material, and confirmed reusable knowledge; preserves archive and provenance boundaries. | PARA classification alone does not resolve ambiguous routing or safe knowledge promotion. | A transparent routing decision and the correct focused workflow. |
+
+These are **AI workflows, not an opaque background service**. They run when a user
+asks an agent to perform the relevant operation (or when the user configures an
+automation to do so). Once a workflow runs, its rules require derived work to stay
+in sync: for example, a material Project record change updates `overview.md` in
+the same task, and a weekly-report workflow derives its report from the underlying
+records rather than from agent memory.
 
 ## The six-layer vault
 
@@ -336,6 +360,8 @@ dependencies):
 This repository is intentionally a **governance-and-workflow blueprint**, not a
 packaged knowledge-management application.
 
+- It includes local AI skills for both LLM-Wiki operations and AI-managed PARA
+  maintenance, but does not run them as an always-on background daemon.
 - It does not bundle a database, vector store, web service, or mandatory CLI.
 - It does not publish personal vault contents or pretend that Git ignore rules are
   a security boundary.
