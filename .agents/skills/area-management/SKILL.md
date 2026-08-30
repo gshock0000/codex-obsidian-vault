@@ -9,7 +9,7 @@ An Area is a user-maintained domain archive, not an agent-owned Wiki. It may con
 
 ## Note modes
 
-Declare an active note's synchronization mode in frontmatter when it will be considered for Wiki promotion:
+Keep Area note YAML limited to `title`, `type`, `status`, `area`, `created`, `updated`, `tags`, `source`, and `summary`. Use `status` for the note lifecycle, such as `ongoing`, `done`, or `archived`. When a note is considered for Wiki promotion, `wiki-ingest` may add a synchronization mode:
 
 ```yaml
 sync:
@@ -23,8 +23,8 @@ The marker is a boundary for incremental reading, not proof that earlier text re
 
 ## Area metadata
 
-For notes that need structured discovery, use `id`, `type`, `area`, `status`, `created`, `updated`, `tags`, and optional `entities`. Use a hierarchical area identifier such as `rf/antenna-design`; use tags only for topics, not ownership.
+Use a hierarchical area identifier such as `rf/antenna-design`; use tags only for topics, not ownership. Do not add manually maintained IDs or Wiki tracking fields to ordinary Area notes.
 
 ## Wiki boundary
 
-Area files may yield candidate resources and concepts, but do not copy the Area into `06_wiki`. Preserve the Area page as context and provenance; compile only stable, reusable, or evidence-backed learning into the Wiki after user confirmation. Use `wiki-ingest` to prepare the proposal.
+Area is a continuous Wiki source. Detect Area changes during normal sync and use `wiki-ingest` to prepare a proposal without waiting for an explicit ingest request. Do not copy an Area into `06_wiki`: compile only stable, reusable, or evidence-backed learning, preserve its provenance, and wait for user confirmation before semantic Wiki writes.
