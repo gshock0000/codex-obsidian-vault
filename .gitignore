@@ -8,3 +8,30 @@ desktop.ini
 *.swo
 *~
 *.tmp
+
+# Obsidian's local interface state
+.obsidian/
+
+# Personal vault content
+#
+# This repository publishes the vault structure, agent instructions, and reusable
+# skills/scripts only. Keep the .gitkeep sentinels so the empty layer structure
+# is preserved, but ignore all knowledge, project, resource, and archive content.
+/01_inbox/**
+!/01_inbox/**/
+!/01_inbox/**/.gitkeep
+/02_Project/**
+!/02_Project/**/
+!/02_Project/**/.gitkeep
+/03_Area/**
+!/03_Area/**/
+!/03_Area/**/.gitkeep
+/04_Resource/**
+!/04_Resource/**/
+!/04_Resource/**/.gitkeep
+/05_Archived/**
+!/05_Archived/**/
+!/05_Archived/**/.gitkeep
+/06_wiki/**
+!/06_wiki/**/
+!/06_wiki/**/.gitkeep
