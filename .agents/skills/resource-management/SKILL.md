@@ -17,4 +17,11 @@ Do not infer that every saved resource has been read, verified, or should become
 
 ## Handoff to the Wiki
 
-Resource is a continuous Wiki source. Detect changes to reviewed or relevant resource cards during normal sync and use `wiki-ingest` to prepare a proposal without waiting for an explicit ingest request. The proposal may create a `06_wiki/resources` page and then update concepts or entities, but it must preserve the resource's original source and must wait for user confirmation before writing the Wiki.
+Resource is a continuous Wiki source. Treat only cards with `status: reviewed`
+or `used` as new promotion candidates during normal sync; `saved` is not yet
+eligible. A `stale` or `archived` card may still affect an already-declared
+dependency but does not create new knowledge. Use `wiki-ingest` to prepare a
+proposal without waiting for another ingest request. The proposal may create a
+`06_wiki/resources` page and then update concepts, entities, claims, or
+syntheses, but it must preserve the resource's original source and wait for
+user confirmation before writing the Wiki.

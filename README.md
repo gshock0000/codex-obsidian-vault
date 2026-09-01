@@ -103,6 +103,7 @@ AI_Vault/
 └── 06_wiki/                          # user-confirmed compiled knowledge
     ├── index.md                      # thin navigation catalog
     ├── overview.md                   # whole-Wiki overview
+    ├── .state/                       # manifest, observations, lock, recovery journals
     ├── log/                          # append-only commit/review log
     ├── resources/                    # evidence and provenance pages
     ├── concepts/                     # reusable methods, patterns, ideas
@@ -238,14 +239,37 @@ concept, entity, claim, or synthesis, create an evidence-backed page in
 derived_from · supports · refines · contradicts · applies_to · uses · supersedes
 ```
 
-When a source changes, use modification time only to find a candidate, then verify
-with a content hash (or a remote revision/ETag). Mark direct resources
-`needs-review` and downstream pages affected. A freshness signal is a request for
-review, never permission to silently rewrite a conclusion.
+The V1 Wiki schema is now explicit. Every knowledge page has a stable ID,
+semantic lifecycle, qualitative confidence, compact retrieval summary,
+provenance, typed relationships, and a pointer to the confirmed knowledge
+commit that last changed it. Resource pages cite source IDs and exact locators;
+derived pages cite Wiki evidence resources. See the
+[page contract](.agents/skills/vault-governance/references/wiki-page-contract.md).
+
+Confirmed source fingerprints and dependencies stay in the hash-chained,
+rebuildable `06_wiki/.state/manifest.json`; scoped current scans use disposable
+`observations.json`, and an exclusive lock plus staged transactions protect
+multi-file recovery. None belongs in semantic page fields. A confirmed page may
+be `accepted` while its effective evidence state is independently
+`needs-review`. The
+[state contract](.agents/skills/vault-governance/references/wiki-state-contract.md)
+keeps these roles separate so a scan cannot accidentally accept drift.
+
+When a source changes, use modification time only to find a candidate, then
+verify with an exact-byte SHA-256 (or a remote revision/ETag). Mark direct
+resources `needs-review` and downstream pages affected. A freshness signal is a
+request for review, never permission to silently rewrite a conclusion.
 
 Area notes may use `append` mode (review material after a `wiki-commit` marker) or
 `snapshot` mode (fingerprint the entire note). Editing pre-marker text requires a
 review; the marker is not proof that earlier text remains unchanged.
+
+A durable Wiki write uses reserved proposal/commit IDs, separate plan and exact
+target-table digests, source/evidence preconditions, explicit confirmation, an
+exclusive lock, staged payloads and preimages, prospective validation,
+compare-and-swap writes, recoverable structural deletion, recovery state, and
+one verifiably hash-chained commit-log file. The full procedure is the
+[knowledge-commit protocol](.agents/skills/vault-governance/references/knowledge-commit-protocol.md).
 
 ## How to use the vault
 
@@ -346,12 +370,15 @@ data.
 Useful public references that informed the documentation pattern (not runtime
 dependencies):
 
-- [LLM Wiki](https://github.com/jackwener/llm-wiki) — agent-native Markdown Wiki
-  operations and bootstrap pattern.
-- [LLM Wiki Agent](https://github.com/peterstef1983/llm-wiki-agent) — source-backed
-  and schema-driven workflow framing.
-- [LLM Wiki](https://github.com/arronKler/llm-wiki) — local-first storage and
-  rebuildable derived state.
+- [claude-obsidian](https://github.com/AgriciDaniel/claude-obsidian) — source and
+  claim provenance, read-only query/lint boundaries, and conflict-aware
+  operation transactions.
+- [llm-wiki-agent](https://github.com/SamurAIGPT/llm-wiki-agent) — a deliberately
+  small Wiki loop, deterministic health checks, and report-only graph health
+  ideas.
+- [obsidian-wiki](https://github.com/Ar9av/obsidian-wiki) — progressive
+  retrieval, explicit/inferred relationship provenance, source delta
+  classification, and staged-change concepts.
 - [Obsidian PARA](https://github.com/byarbrough/obsidian-para) — PARA explanations
   and Obsidian onboarding inspiration.
 
@@ -384,6 +411,7 @@ why a page exists.
 | Capture web research | [`.agents/skills/research-capture/SKILL.md`](.agents/skills/research-capture/SKILL.md) |
 | Propose a Wiki promotion | [`.agents/skills/wiki-ingest/SKILL.md`](.agents/skills/wiki-ingest/SKILL.md) |
 | Check freshness and structure | [`.agents/skills/wiki-lint/SKILL.md`](.agents/skills/wiki-lint/SKILL.md) |
+| Implement or review the Wiki schema | [Wiki contracts](.agents/skills/vault-governance/references/wiki-page-contract.md) |
 | Create a source note | [`Templates/`](Templates/) |
 
 ---

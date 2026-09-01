@@ -85,6 +85,7 @@ AI_Vault/
 └── 06_wiki/                          # 经用户确认的已编译知识
     ├── index.md                      # 精简导航目录
     ├── overview.md                   # 全 Wiki 总览
+    ├── .state/                       # manifest、观测缓存、写锁与恢复日志
     ├── log/                          # 只追加的提交/审阅日志
     ├── resources/                    # 证据与溯源页面
     ├── concepts/                     # 可复用的方法、模式和概念
@@ -195,9 +196,15 @@ summary: "用一句话说明该笔记存在的目的。"
 derived_from · supports · refines · contradicts · applies_to · uses · supersedes
 ```
 
-来源变更时，先用修改时间找出候选，再使用内容哈希（或远端 revision/ETag）确认。应将直接资源标记为 `needs-review`，并标记下游页面受影响。鲜度信号只是审阅请求，绝不是静默重写结论的授权。
+V1 Wiki schema 现已明确：每个知识页面都有稳定 ID、语义生命周期、定性置信度、简短检索摘要、溯源、类型化关系，以及最后一次修改它的已确认 knowledge commit。资源页引用 source ID 与精确定位；派生页引用 Wiki 证据资源。详见 [页面契约](.agents/skills/vault-governance/references/wiki-page-contract.md)。
+
+已确认的来源指纹与依赖保存在带哈希链、可重建的 `06_wiki/.state/manifest.json`；有范围的当前扫描写入可丢弃的 `observations.json`，独占写锁与 staged transaction 共同保护多文件恢复。它们都不混入语义字段。一个页面可以在语义上仍为 `accepted`，同时其证据的有效状态为 `needs-review`。[状态契约](.agents/skills/vault-governance/references/wiki-state-contract.md) 将这些职责分开，防止扫描过程意外接受漂移。
+
+来源变更时，先用修改时间找出候选，再以精确字节 SHA-256（或远端 revision/ETag）确认。应将直接资源标记为 `needs-review`，并标记下游页面受影响。鲜度信号只是审阅请求，绝不是静默重写结论的授权。
 
 Area 笔记可使用 `append` 模式（在 `wiki-commit` 标记后检查新增内容）或 `snapshot` 模式（对整份笔记计算指纹）。对标记前文本的编辑必须触发审阅；该标记不证明先前文本未变。
+
+持久化 Wiki 写入需要预留 proposal/commit ID、分别绑定语义计划与精确 target table 的两个 digest、来源/证据前置哈希、明确确认、独占写锁、staged payload 与 preimage、写前校验、compare-and-swap、可恢复的结构性删除、恢复状态，以及一份可验证哈希链提交日志。完整过程见 [knowledge-commit 协议](.agents/skills/vault-governance/references/knowledge-commit-protocol.md)。
 
 ## 如何使用
 
@@ -281,9 +288,9 @@ Obsidian 是可选项，但本仓库可直接作为 vault 打开。它使用纯 
 
 下列公开项目仅为文档表达方式提供参考，并非运行时依赖：
 
-- [LLM Wiki](https://github.com/jackwener/llm-wiki) —— 面向智能体的 Markdown Wiki 操作与 bootstrap 模式。
-- [LLM Wiki Agent](https://github.com/peterstef1983/llm-wiki-agent) —— 基于来源、模式驱动的工作流表达。
-- [LLM Wiki](https://github.com/arronKler/llm-wiki) —— 本地优先存储与可重建派生状态。
+- [claude-obsidian](https://github.com/AgriciDaniel/claude-obsidian) —— 来源/主张溯源、只读 query/lint 边界，以及冲突感知的操作事务。
+- [llm-wiki-agent](https://github.com/SamurAIGPT/llm-wiki-agent) —— 精简 Wiki 循环、确定性健康检查，以及只报告不自动修复的图健康思路。
+- [obsidian-wiki](https://github.com/Ar9av/obsidian-wiki) —— 渐进检索、显式/推断关系溯源、来源增量分类和分阶段变更思路。
 - [Obsidian PARA](https://github.com/byarbrough/obsidian-para) —— PARA 解释与 Obsidian 上手方式。
 
 ## 当前范围与非目标
@@ -308,6 +315,7 @@ Obsidian 是可选项，但本仓库可直接作为 vault 打开。它使用纯 
 | 捕获网页研究 | [`.agents/skills/research-capture/SKILL.md`](.agents/skills/research-capture/SKILL.md) |
 | 提出 Wiki 沉淀提案 | [`.agents/skills/wiki-ingest/SKILL.md`](.agents/skills/wiki-ingest/SKILL.md) |
 | 检查鲜度与结构 | [`.agents/skills/wiki-lint/SKILL.md`](.agents/skills/wiki-lint/SKILL.md) |
+| 实现或审阅 Wiki schema | [Wiki 契约](.agents/skills/vault-governance/references/wiki-page-contract.md) |
 | 创建源笔记 | [`Templates/`](Templates/) |
 
 ---

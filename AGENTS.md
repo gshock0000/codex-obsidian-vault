@@ -44,6 +44,7 @@ Project-local Skills live only in `.agents/skills/`. Read and update the relevan
 06_wiki/                          # user-confirmed compiled knowledge
 ├─ index.md                        # thin navigation catalog
 ├─ overview.md                     # whole-Wiki overview
+├─ .state/                         # manifest, disposable observations, write lock, and recovery journals
 ├─ log/                            # append-only knowledge commit and review logs
 ├─ resources/                      # evidence-backed resource pages
 ├─ concepts/                       # reusable concepts, methods, and patterns
@@ -67,7 +68,7 @@ Create only directories needed by confirmed work. Do not create placeholder proj
 ## Wiki source policy
 
 - `01_inbox` and `02_Project` are opt-in Wiki sources. Do not discover, propose, or promote new Wiki knowledge from them unless the user explicitly asks to ingest the specified material. This includes ideas, research reports, project decisions, activities, and project knowledge cards.
-- `03_Area` and `04_Resource` are continuous Wiki sources. Their changes must be included in normal sync and lint work without requiring a separate ingest request from the user.
+- `03_Area` and eligible `04_Resource` records are continuous Wiki sources. New Resource promotion candidates require `status: reviewed` or `used`; changes to an already-declared dependency remain freshness-check eligible regardless of current status.
 - Continuous sync does not make the Wiki a mirror: compile only durable, relevant understanding and retain source provenance. A changed Area or Resource item must create a review/proposal for affected Wiki content rather than silently overwrite meaning.
 - If an Inbox or Project record has already been promoted, its existing source dependency remains eligible for lint freshness checks; this does not authorize a new promotion.
 - All semantic Wiki writes still require a user-confirmed knowledge-commit proposal. Continuous sync autonomously detects drift and prepares that proposal.
@@ -92,9 +93,9 @@ Weekly reports live in `wk_reports/` and are derived status snapshots. Before cr
 
 `03_Area` contains evolving domain notes as well as durable references. Use hierarchical area identifiers such as `rf/antenna-design`; use tags for subjects rather than ownership.
 
-When an Area note is eligible for later Wiki promotion, `wiki-ingest` may add a synchronization mode:
+When an Area note enters confirmed Wiki provenance, `wiki-ingest` records its synchronization mode in the machine-managed manifest rather than adding tracking fields to the user-maintained note:
 
-- `append` for normally growing logs and learning notes. After a confirmed promotion, record a `<!-- wiki-commit: <id> -->` marker; later ingest examines the tail first.
+- `append` for normally growing logs and learning notes. After a confirmed promotion, record a `<!-- wiki-commit: <id> -->` marker; later ingest examines the tail first. This user-confirmed checkpoint marker is the only source-layer write coupled to a Wiki knowledge commit.
 - `snapshot` for notes that may be revised anywhere. Detect changes by content fingerprint and mark dependent Wiki pages for review.
 
 An append marker is not proof that earlier content is unchanged. An edit before the marker requires review of affected Wiki resources.
@@ -110,7 +111,7 @@ When performing external research intended for the vault:
 
 ## Wiki promotion and structure
 
-`06_wiki` is compiled knowledge, not a copy of its sources. All Wiki writes require a user-confirmed knowledge-commit proposal.
+`06_wiki` is compiled knowledge, not a copy of its sources. Every durable Wiki write—including semantic change, evidence re-verification, index regeneration, and structural repair—requires a user-confirmed proposal under the knowledge-commit protocol. The only exception is an explicitly requested refresh of disposable `.state/observations.json`; it still uses the exclusive Wiki write lock and cannot change the manifest or a committed baseline.
 
 Before proposing a Wiki change, state:
 
@@ -125,12 +126,16 @@ Source-specific default rules:
 - From `01_inbox`, ingest only material the user explicitly selects. Promote stable learning or evidence-backed findings only; do not promote raw ideas or unverified conclusions.
 - From `02_Project`, ingest only material the user explicitly selects. If selected, consider verified decisions, activities with reusable evidence or lessons, and project knowledge cards; exclude plans, `overview.md`, weekly reports, TODOs, and unverified issue hypotheses by default.
 - From `03_Area`, continuously synchronize stable and reusable learning without copying the entire note.
-- From `04_Resource`, continuously synchronize reviewed or relevant resources without waiting for an explicit ingest request.
+- From `04_Resource`, continuously synchronize records with `status: reviewed` or `used` without waiting for an explicit ingest request. A `saved` record is not a new candidate; `stale` or `archived` may still affect an existing dependency.
 - Never perform a new ingest from `05_Archived`.
 
-Create an evidence-backed `06_wiki/resources/` page before deriving a material concept or claim. Use resource pages to preserve the chain from project decision, person/team confirmation, and test data to a conclusion.
+Create an evidence-backed `06_wiki/resources/` page before deriving a material concept, entity, claim, or synthesis. Use resource pages to preserve the chain from project decision, person/team confirmation, and test data to a conclusion.
 
-The detailed frontmatter for Wiki page types is intentionally undecided until a reference LLM-Wiki implementation is selected. Ingest and lint tracking belongs in the machine-managed manifest and the eventual Wiki page schema, not in everyday source-note templates.
+Knowledge pages use the canonical contract in `.agents/skills/vault-governance/references/wiki-page-contract.md`. Every page has a stable type-qualified ID, semantic `status`, qualitative `confidence`, short `summary`, origins, typed relationships, and a `last_confirmed_commit`. Resource pages preserve source IDs and locators in `source_refs`; concepts, entities, claims, and syntheses cite Wiki resource evidence through `evidence_refs`. Keep fingerprints, mtimes, remote revisions, and computed review state out of semantic page fields.
+
+Machine state follows `.agents/skills/vault-governance/references/wiki-state-contract.md` and lives under `06_wiki/.state/`. The canonical, hash-chained manifest contains confirmed baselines, dependencies, and the verifiable log-chain head; disposable `observations.json` contains a scoped scan cache; `write.lock`, active transaction journals, staged payloads, and preimages are operational recovery data. Page lifecycle (`provisional`, `accepted`, `disputed`, `superseded`, or `archived`) and effective review state (`current`, `needs-review`, `missing-source`, `archived-source`, or `superseded`) are independent.
+
+Every durable write follows `.agents/skills/vault-governance/references/knowledge-commit-protocol.md`: reserve proposal and commit IDs, bind the semantic plan and exact target table with separate digests, capture source/evidence preconditions, obtain confirmation, acquire the exclusive lock, stage desired payloads and preimages, validate the prospective snapshot, compare-and-swap each target, preserve recoverable structural deletions, post-verify, and add one verifiably hash-chained log file. Parallel agents may research, challenge, or draft but do not independently write Wiki semantics.
 
 Use only these initial relationship types: `derived_from`, `supports`, `refines`, `contradicts`, `applies_to`, `uses`, and `supersedes`.
 
@@ -140,11 +145,13 @@ Treat freshness as a provenance question, not text equality between a source and
 
 - Use modification time only to find local files that may have changed.
 - Compare content hashes to confirm local changes; use revision or ETag for remote sources when available.
-- Keep last-observed source fingerprints and dependency status in rebuildable machine-managed manifest state.
-- When a source changes, flag its direct Wiki resource as `needs-review`; flag downstream concepts, claims, and syntheses as affected. Do not silently rewrite them.
+- Keep confirmed baselines and dependencies in the rebuildable manifest; keep last-observed fingerprints in disposable `observations.json` or in memory. A read-only lint or query must not write either file or advance the confirmed baseline.
+- When a source changes, flag its direct Wiki resource as `needs-review`; flag downstream concepts, claims, syntheses, and any evidence-dependent Wiki overview as affected. Do not silently rewrite them.
+- Represent a new continuous-source candidate by locator until confirmed. Treat a unique byte-identical replacement path as a confirmation-bound `relocate` candidate; never rebind automatically or infer identity from a path.
+- If a complete scoped review finds changed source bytes but unchanged relevant evidence and compiled meaning, propose a confirmation-bound `reverify` commit. It may advance the committed source baseline and review log without changing page content; a merely touched file with an identical byte hash is a no-op.
 - Lint checks links, IDs, frontmatter, relationship vocabulary, source existence, source drift, archived paths, append-marker changes, orphans, contradictions, stale pages, and index drift.
 - Structural repairs and semantic changes must be presented separately. Never perform semantic repairs without user confirmation.
 
 ## Query behavior
 
-Answer durable-knowledge questions from `06_wiki`, citing internal pages and disclosing stale or missing evidence. For a question about a project, first enumerate and search the project's Markdown files, then read the relevant records before reasoning or answering. Read `overview.md` as the live summary but verify it against `activities/`, `plans/`, `decisions/`, `knowledge/`, and `wk_reports/` as the question requires. Label the result as live project context. A useful answer is not automatically a Wiki update; offer a synthesis proposal when it has standalone long-term value.
+Answer durable-knowledge questions from `06_wiki`, citing internal pages and disclosing stale or missing evidence. Query is read-only: it does not update logs, indexes, caches, manifest observations, or page status. For a question about a project, first enumerate and search the project's Markdown files, then read the relevant records before reasoning or answering. Read `overview.md` as the live summary but verify it against `activities/`, `plans/`, `decisions/`, `knowledge/`, and `wk_reports/` as the question requires. Label the result as live project context. A useful answer is not automatically a Wiki update; offer a synthesis proposal when it has standalone long-term value.

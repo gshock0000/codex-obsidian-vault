@@ -9,14 +9,15 @@ An Area is a user-maintained domain archive, not an agent-owned Wiki. It may con
 
 ## Note modes
 
-Keep Area note YAML limited to `title`, `type`, `status`, `area`, `created`, `updated`, `tags`, `source`, and `summary`. Use `status` for the note lifecycle, such as `ongoing`, `done`, or `archived`. When a note is considered for Wiki promotion, `wiki-ingest` may add a synchronization mode:
+Keep Area note YAML limited to `title`, `type`, `status`, `area`, `created`,
+`updated`, `tags`, `source`, and `summary`. Use `status` for the note lifecycle,
+such as `ongoing`, `done`, or `archived`. When a note first enters confirmed
+Wiki provenance, `wiki-ingest` records its `append` or `snapshot` synchronization
+mode in the machine-managed manifest. Do not add IDs, hashes, or sync tracking
+fields to the Area note. If the user explicitly wants visible source-note
+metadata, handle that as a separate Area edit rather than a coupled Wiki write.
 
-```yaml
-sync:
-  mode: append # or snapshot
-```
-
-- `append`: for reading notes, research journals, and observation logs that normally grow at the end. After a confirmed Wiki commit, append a `<!-- wiki-commit: <id> -->` marker. Later ingest reads the tail first.
+- `append`: for reading notes, research journals, and observation logs that normally grow at the end. After a confirmed Wiki commit, append the exact approved `<!-- wiki-commit: <id> -->` marker. This marker is the only source-layer edit coupled to that Wiki transaction. Later ingest verifies the prefix before reading the tail first.
 - `snapshot`: for methods, reference notes, and content that may be revised anywhere. Use content fingerprinting to detect changes and request review of affected Wiki resources.
 
 The marker is a boundary for incremental reading, not proof that earlier text remains unchanged. If earlier content changes, mark dependent Wiki resources `needs-review`.
