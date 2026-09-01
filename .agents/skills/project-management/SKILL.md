@@ -11,12 +11,12 @@ A project folder is the source of truth for active work. Keep each record in its
 
 ```text
 02_Project/<project>/
-├─ overview.md
-├─ plans/
-├─ decisions/
-├─ activities/
-├─ knowledge/
-└─ wk_reports/
+|-- overview.md
+|-- plans/
+|-- decisions/
+|-- activities/
+|-- knowledge/
+`-- wk_reports/
 ```
 
 - `plans/`: plans and milestones.
@@ -39,6 +39,19 @@ Use a concise `status` that fits the record:
 
 Add fields only when they clarify the record. Decisions may include alternatives and supersession. Activities may include an owner, next action, test result, evidence, or a link to the related plan. Keep resolved activities and superseded decisions as history.
 
+## Record creation
+
+The user primarily maintains project folders. Do not install templates into
+Obsidian, create a project skeleton, or add placeholder records unless the user
+asks for those files.
+
+When the user asks the agent to create a plan, decision, activity, issue, test,
+idea, or knowledge record, use the focused internal template in
+[project-record-templates.md](references/project-record-templates.md). Select
+only the record type requested or genuinely needed, and ground its content in
+the user's supplied context. These are agent instructions, not Obsidian
+templates.
+
 ## Live overview
 
 When creating or rebuilding this page, use [the project-generated page templates](references/project-page-templates.md). Those templates are agent-internal and must not be copied into Obsidian's `Templates/` folder.
@@ -46,9 +59,32 @@ When creating or rebuilding this page, use [the project-generated page templates
 
 - overall health (`on_track`, `at_risk`, or `blocked`), current phase, current focus, and the last meaningful change;
 - counts of ongoing APs, APs completed this week, unresolved issues, and blocked APs;
-- current blockers or risks, upcoming plan items, and navigation to the latest weekly report, relevant plans, key decisions, and active activities.
+- an assessment of every ongoing activity's pending work, blocker/waiting condition, explicit risk, and decision-needed signal; summarize the counts and list the non-routine cases in the overview;
+- current blockers or risks, decision-needed items, upcoming plan items, and navigation to the latest weekly report, relevant plans, key decisions, and active activities.
 
-Derive counts and status from project records. State the check date and do not invent a count if records are incomplete. When an agent changes a plan, decision, or activity that materially changes current project state, update `overview.md` in the same task unless the user asks not to.
+Derive counts and status from project records. State the check date and do not invent a count if records are incomplete. Do not add activity-assessment fields to frontmatter: the assessment belongs in the derived overview and must link back to source records. When an agent changes a plan, decision, or activity that materially changes current project state, update `overview.md` in the same task unless the user asks not to.
+
+## Project health refresh and validation
+
+When the user asks to refresh or rebuild an overview, assess project health,
+validate a project, audit current status, or ask what is pending, blocked,
+risky, or awaiting a decision, read
+[project-health-refresh.md](references/project-health-refresh.md) before
+acting.
+
+Use the two operations deliberately:
+
+- **Validate** is read-only. It reports structural findings, evidence gaps, and
+a per-ongoing-activity assessment. Do not repair source records or overwrite
+`overview.md` unless the user also asks for that change.
+- **Refresh overview** recomputes the derived `overview.md` from source records
+and may update that page only. It does not silently change an activity's
+frontmatter, status, wording, or history. Preserve clearly user-authored
+content outside the derived sections; if that boundary is unclear, show the
+proposed change rather than overwriting it.
+
+This initial version is intentionally file- and evidence-based. It does not
+require a tracker, metrics, a script, or new frontmatter fields.
 
 ## Weekly reports
 
@@ -75,4 +111,4 @@ For a status question, read `overview.md`, all relevant activities, current plan
 
 `02_Project` is opt-in for Wiki ingest. Do not propose or promote new Wiki knowledge unless the user explicitly selects the project material. If selected, verified decisions, activities with reusable evidence or lessons, and knowledge cards may be candidates. Plans, `overview.md`, weekly reports, TODOs, and unverified hypotheses are excluded by default.
 
-Only move a finished project to `05_Archived/projects/` when the user requests it. Existing Wiki provenance remains reconciled through manifest-issued source IDs after paths change.
+Only move a finished project to `05_Archived/projects/` when the user requests it. When a user asks to archive a project, first ask whether they want the agent to review incomplete work and risks, and whether they want a separate proposal for selected decisions, evidence, or reusable lessons to enter the Wiki. Do not treat that review as authorization to archive or ingest beyond the user's request. Existing Wiki provenance remains reconciled through manifest-issued source IDs after paths change.

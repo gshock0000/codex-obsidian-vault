@@ -17,44 +17,68 @@ source:
 summary:
 ---
 
-## 当前状态
+## Current State
 
-- 总体状态：on_track / at_risk / blocked
-- 状态更新时间：
-- 当前阶段：
-- 当前重点：
-- 自上次更新的主要变化：
+- Overall Health: on_track / at_risk / blocked
+- Status Checked:
+- Current Phase:
+- Current Focus:
+- Key Change Since Last Update:
 
-## AP 与问题概览
+## AP and Issue Summary
 
-| 项目 | 数量 |
+| Item | Count |
 | --- | ---: |
-| 进行中的 AP |  |
-| 本周完成的 AP |  |
-| 未解决问题 |  |
-| 被阻塞的 AP |  |
+| Ongoing APs |  |
+| APs Completed This Week |  |
+| Unresolved Issues |  |
+| Blocked APs |  |
 
-## 当前阻塞与风险
+## Ongoing Activity Assessment
+
+- Assessment Date:
+- Scope: all activity records with `status: ongoing`
+- Note: categories may overlap. They are derived from body evidence and are not written back to activity frontmatter.
+
+| Category | Count | Notes |
+| --- | ---: | --- |
+| Clear Pending Work |  |  |
+| Blocked or Waiting |  |  |
+| Explicit Risk |  |  |
+| Decision Needed |  |  |
+| Needs Clarification |  |  |
+
+## Current Blockers, Risks, and Decisions Needed
+
+### Blockers or Risks
 
 -
 
-## 近期计划
+### Decisions Needed
 
 -
 
-## 导航
+### Ongoing Activities Requiring Clarification
 
-- 最新周报：
-- 相关计划：
-- 关键决策：
-- 当前活动：
+-
+
+## Upcoming Plan
+
+-
+
+## Navigation
+
+- Latest Weekly Report:
+- Related Plans:
+- Key Decisions:
+- Current Activities:
 ```
 
 ## `wk_reports/YYYY-Www.md`
 
 ```markdown
 ---
-title: "<YYYY-Www> 周报"
+title: "<YYYY-Www> Weekly Report"
 type: wk_report
 status: done
 project: <project>
@@ -65,34 +89,34 @@ source:
 summary:
 ---
 
-## 本周状态
+## Week Status
 
-- 总体状态：on_track / at_risk / blocked
-- 相比上周：无变化 / 改善 / 恶化
-- 变化依据：
+- Overall Health: on_track / at_risk / blocked
+- Change Since Last Week: unchanged / improved / worsened
+- Evidence for Change:
 
-## 已完成 AP
-
--
-
-## 进行中、阻塞的 AP 与未解决问题
+## Completed APs
 
 -
 
-## 计划与决策检查
-
-- 本周计划完成情况：
-- 计划变化：
-- 新决策或需要确认的事项：
-
-## 下周重点
+## Ongoing and Blocked APs and Unresolved Issues
 
 -
 
-## 证据记录
+## Plan and Decision Review
 
-- 上周周报：
-- 活动记录：
-- 计划：
-- 决策：
+- Progress Against This Week's Plan:
+- Plan Changes:
+- New Decisions or Items Requiring Confirmation:
+
+## Next Week's Focus
+
+-
+
+## Evidence Records
+
+- Previous Weekly Report:
+- Activity Records:
+- Plans:
+- Decisions:
 ```
